@@ -8,47 +8,64 @@ interface Props {
   images: ShootImage[];
 }
 
-function buildDownloadUrl(url: string, width: number): string {
-  try {
-    const u = new URL(url);
-    u.searchParams.set("w", String(width));
-    u.searchParams.set("fit", "max");
-    u.searchParams.set("auto", "format");
-    return u.toString();
-  } catch {
-    return url;
-  }
+async function resizeImageBlob(blob: Blob, maxWidth: number, quality = 0.92): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(blob);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("Could not initialize canvas context"));
+        return;
+      }
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (resizedBlob) => {
+          if (resizedBlob) {
+            resolve(resizedBlob);
+          } else {
+            reject(new Error("Canvas export failed"));
+          }
+        },
+        "image/jpeg",
+        quality
+      );
+    };
+    img.onerror = (err) => {
+      URL.revokeObjectURL(objectUrl);
+      reject(err);
+    };
+    img.src = objectUrl;
+  });
 }
 
-function originalUrl(url: string): string {
-  try {
-    const u = new URL(url);
-    // Strip resize params to get the closest-to-original Unsplash delivers
-    u.searchParams.delete("w");
-    u.searchParams.delete("h");
-    u.searchParams.set("fit", "max");
-    u.searchParams.set("auto", "format");
-    return u.toString();
-  } catch {
-    return url;
-  }
-}
-
-async function triggerDownload(href: string, filename: string) {
-  const res = await fetch(href);
-  const blob = await res.blob();
+function triggerBlobDownload(blob: Blob, filename: string) {
   const blobUrl = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = blobUrl;
   a.download = filename;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(blobUrl);
 }
 
 export default function ImageGallery({ images }: Props) {
   const [selected, setSelected] = useState<ShootImage | null>(null);
   const [current, setCurrent] = useState(0);
-  const [downloading, setDownloading] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState<"sd" | "hd" | "original" | null>(null);
 
   const openModal = (img: ShootImage, idx: number) => {
     setSelected(img);
@@ -68,13 +85,23 @@ export default function ImageGallery({ images }: Props) {
     if (!selected || downloading) return;
     setDownloading(type);
     try {
+      const res = await fetch(selected.url);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch image: ${res.statusText}`);
+      }
+      const rawBlob = await res.blob();
       const base = selected.name.replace(/\.[^/.]+$/, "") || "photo";
-      const filename = `${base}_${type}.jpg`;
-      const url =
-        type === "sd" ? buildDownloadUrl(selected.url, 640) :
-        type === "hd" ? buildDownloadUrl(selected.url, 1920) :
-        originalUrl(selected.url);
-      await triggerDownload(url, filename);
+
+      if (type === "original") {
+        const ext = selected.name.includes(".") ? selected.name.split(".").pop() : "jpg";
+        triggerBlobDownload(rawBlob, `${base}_original.${ext}`);
+      } else {
+        const maxWidth = type === "sd" ? 1080 : 2560;
+        const resizedBlob = await resizeImageBlob(rawBlob, maxWidth);
+        triggerBlobDownload(resizedBlob, `${base}_${type.toUpperCase()}.jpg`);
+      }
+    } catch (err) {
+      console.error("Download failed:", err);
     } finally {
       setDownloading(null);
     }
@@ -228,24 +255,61 @@ export default function ImageGallery({ images }: Props) {
                 </div>
 
                 {/* Download options */}
-                <div className="flex items-center gap-1 pointer-events-auto">
-                  {(["sd", "hd", "original"] as const).map((type) => (
-                    <button
-                      key={type}
-                      onClick={() => handleDownload(type)}
-                      disabled={!!downloading}
-                      className="px-3 py-2 text-xs tracking-widest uppercase cursor-pointer disabled:opacity-40 transition-colors"
-                      style={{
-                        color: downloading === type ? "var(--accent)" : "var(--muted-foreground)",
-                        background: "none",
-                        border: "1px solid var(--border)",
-                        borderRadius: "var(--radius)",
-                        fontFamily: "inherit",
-                      }}
-                    >
-                      {downloading === type ? "…" : type === "sd" ? "SD" : type === "hd" ? "HD" : "Original"}
-                    </button>
-                  ))}
+                <div className="flex items-center gap-2 pointer-events-auto flex-wrap justify-end">
+                  {(
+                    [
+                      { type: "sd", label: "SD (1080px)" },
+                      { type: "hd", label: "HD (2560px)" },
+                      { type: "original", label: "Original" },
+                    ] as const
+                  ).map(({ type, label }) => {
+                    const isLoading = downloading === type;
+                    return (
+                      <button
+                        key={type}
+                        onClick={() => handleDownload(type)}
+                        disabled={!!downloading}
+                        className="px-3 py-2 text-xs tracking-widest uppercase cursor-pointer disabled:opacity-40 transition-colors inline-flex items-center gap-1.5"
+                        style={{
+                          color: isLoading ? "var(--accent)" : "var(--muted-foreground)",
+                          background: "none",
+                          border: `1px solid ${isLoading ? "var(--accent)" : "var(--border)"}`,
+                          borderRadius: "var(--radius)",
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        {isLoading && (
+                          <svg
+                            className="animate-spin h-3 w-3"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
+                          </svg>
+                        )}
+                        <span>
+                          {isLoading
+                            ? type === "original"
+                              ? "Downloading…"
+                              : "Resizing…"
+                            : label}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </motion.div>
             </>

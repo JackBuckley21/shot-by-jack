@@ -234,32 +234,31 @@ export default function ImageGallery({ images }: Props) {
                 transition={{ delay: 0.12, duration: 0.3 }}
               >
                 {/* EXIF metadata */}
-                <div className="flex flex-col gap-2 pointer-events-auto">
-                  {meta?.camera && (
-                    <p className="text-xs tracking-widest uppercase" style={{ color: "var(--accent)" }}>
-                      {meta.camera}
-                    </p>
+                <div className="flex flex-col gap-1.5 pointer-events-auto max-w-xl">
+                  {meta && Object.keys(meta).length > 0 ? (
+                    <div className="flex items-center gap-2 flex-wrap text-xs font-mono text-neutral-200 leading-relaxed">
+                      {[
+                        meta.camera,
+                        meta.lens,
+                        meta.focalLength,
+                        meta.aperture,
+                        meta.shutterSpeed,
+                        meta.iso,
+                      ]
+                        .filter(Boolean)
+                        .map((item, idx, arr) => (
+                          <span key={idx} className="inline-flex items-center gap-2">
+                            <span>{item}</span>
+                            {idx < arr.length - 1 && (
+                              <span className="text-neutral-500 select-none">•</span>
+                            )}
+                          </span>
+                        ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs font-mono text-neutral-400">No EXIF metadata</p>
                   )}
-                  <div className="flex items-center gap-5 flex-wrap">
-                    {meta?.shutterSpeed && (
-                      <MetaItem label="Shutter" value={meta.shutterSpeed} />
-                    )}
-                    {meta?.aperture && (
-                      <MetaItem label="Aperture" value={meta.aperture} />
-                    )}
-                    {meta?.iso && (
-                      <MetaItem label="ISO" value={meta.iso} />
-                    )}
-                    {meta?.focalLength && (
-                      <MetaItem label="Focal" value={meta.focalLength} />
-                    )}
-                    {!meta && (
-                      <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
-                        No metadata
-                      </p>
-                    )}
-                  </div>
-                  <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>
+                  <p className="text-xs tracking-wider uppercase text-neutral-400 font-sans">
                     {selected.name}
                   </p>
                 </div>
@@ -327,18 +326,5 @@ export default function ImageGallery({ images }: Props) {
         </AnimatePresence>
       </LayoutGroup>
     </>
-  );
-}
-
-function MetaItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-[10px] tracking-widest uppercase" style={{ color: "var(--muted-foreground)" }}>
-        {label}
-      </span>
-      <span className="text-sm font-light" style={{ color: "var(--foreground)", fontFamily: "var(--font-sans)" }}>
-        {value}
-      </span>
-    </div>
   );
 }

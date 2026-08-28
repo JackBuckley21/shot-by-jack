@@ -22,7 +22,7 @@ export default function ArchiveGallery() {
   }, []);
 
   return (
-    <div style={{ paddingTop: "6rem" }}>
+    <div className="pb-16">
       <motion.div
         className="px-8 md:px-20 py-16"
         initial={{ opacity: 0, y: 20 }}

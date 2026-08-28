@@ -13,12 +13,62 @@ import {
   type ShootImage,
 } from "@/lib/firestore";
 import { storage } from "@/lib/firebase";
-import { ref as storageRef, uploadBytes, deleteObject } from "firebase/storage";
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { MOCK_SHOOTS, MOCK_IMAGES } from "@/lib/mockData";
 
 const isMock = !process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
 
 type View = "shoots" | "shoot";
+
+async function resizeCoverToWebP(file: File, maxWidth = 1920, quality = 0.82): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("Could not initialize canvas context"));
+        return;
+      }
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            canvas.toBlob(
+              (jpgBlob) => {
+                if (jpgBlob) resolve(jpgBlob);
+                else reject(new Error("Canvas export failed"));
+              },
+              "image/jpeg",
+              quality
+            );
+          }
+        },
+        "image/webp",
+        quality
+      );
+    };
+    img.onerror = (err) => {
+      URL.revokeObjectURL(objectUrl);
+      reject(err);
+    };
+    img.src = objectUrl;
+  });
+}
 
 // ── Mock state (lives outside component so it survives navigation) ──────────
 let mockShoots: Shoot[] = MOCK_SHOOTS.map((s) => ({ ...s }));
@@ -118,27 +168,30 @@ export default function AdminPage() {
         await load();
         showToast(`"${newName}" created`);
       } else {
+        let coverUrl = "";
+        let coverPath = "";
         const file = coverInputRef.current?.files?.[0];
-        const docRef = await createShoot({
+        if (file) {
+          const webpBlob = await resizeCoverToWebP(file, 1920, 0.82);
+          const base = file.name.replace(/\.[^/.]+$/, "");
+          coverPath = `covers/${Date.now()}_${base}.webp`;
+          const sRef = storageRef(storage, coverPath);
+          await uploadBytes(sRef, webpBlob, {
+            contentType: "image/webp",
+            cacheControl: "public, max-age=31536000",
+          });
+          coverUrl = await getDownloadURL(sRef);
+        }
+        await createShoot({
           name: newName,
           date: newDate,
           description: newDesc,
-          coverUrl: "",
-          coverPath: "",
+          coverUrl,
+          coverPath,
           imageCount: 0,
         });
-        if (file) {
-          const path = `shoots/${docRef.id}/cover/raw/${Date.now()}_${file.name}`;
-          const sRef = storageRef(storage, path);
-          await uploadBytes(sRef, file);
-        }
         await load();
         showToast(`"${newName}" created`);
-        if (file) {
-          setTimeout(() => {
-            load();
-          }, 2500);
-        }
       }
       setNewName("");
       setNewDate(new Date().toISOString().slice(0, 10));
@@ -232,7 +285,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div style={{ paddingTop: "6rem" }} className="min-h-dvh">
+    <div className="min-h-dvh pb-16">
       {/* Toast */}
       <AnimatePresence>
         {toast && (

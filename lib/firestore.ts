@@ -34,6 +34,7 @@ export interface ImageMeta {
   shutterSpeed?: string;
   focalLength?: string;
   camera?: string;
+  lens?: string;
 }
 
 export interface ShootImage {

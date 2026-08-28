@@ -39,6 +39,7 @@ export default function ShootCard({ shoot, index }: Props) {
                 alt={shoot.name}
                 loading="lazy"
                 decoding="async"
+                fetchPriority="high"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
             ) : (

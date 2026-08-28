@@ -76,28 +76,63 @@ export const processUploadedPhoto = onObjectFinalized(
         if (!shootId) return;
 
         // 1. Extract camera EXIF metadata
-        let meta = {};
+        let meta: Record<string, string> = {};
         try {
-            const parsedExif = await exifr.parse(rawBuffer, [
-                "ISO",
-                "FNumber",
-                "ExposureTime",
-                "FocalLength",
-                "Model",
-            ]);
+            const parsedExif = await exifr.parse(rawBuffer, {
+                tiff: true,
+                xmp: true,
+                exif: true,
+                mergeOutput: true,
+            });
 
             if (parsedExif) {
-                meta = {
-                    iso: parsedExif.ISO ? String(parsedExif.ISO) : undefined,
-                    aperture: parsedExif.FNumber ? `f/${parsedExif.FNumber}` : undefined,
-                    shutterSpeed: parsedExif.ExposureTime
-                        ? parsedExif.ExposureTime < 1
-                            ? `1/${Math.round(1 / parsedExif.ExposureTime)}s`
-                            : `${parsedExif.ExposureTime}s`
-                        : undefined,
-                    focalLength: parsedExif.FocalLength ? `${Math.round(parsedExif.FocalLength)}mm` : undefined,
-                    camera: parsedExif.Model || "Sony a6400",
+                const rawCamera = parsedExif.Model || parsedExif.Make;
+                const camera = rawCamera ? String(rawCamera).trim() : "Sony a6400";
+                const rawLens = parsedExif.LensModel || parsedExif.Lens || parsedExif.LensType;
+                const lens = rawLens ? String(rawLens).trim() : undefined;
+
+                let focalLength: string | undefined;
+                if (parsedExif.FocalLength !== undefined && parsedExif.FocalLength !== null) {
+                    const fl = Number(parsedExif.FocalLength);
+                    if (!isNaN(fl) && fl > 0) {
+                        focalLength = `${Math.round(fl)}mm`;
+                    }
+                }
+
+                let aperture: string | undefined;
+                if (parsedExif.FNumber !== undefined && parsedExif.FNumber !== null) {
+                    const fn = Number(parsedExif.FNumber);
+                    if (!isNaN(fn) && fn > 0) {
+                        aperture = `f/${fn % 1 === 0 ? fn.toFixed(0) : fn.toFixed(1)}`;
+                    }
+                }
+
+                let shutterSpeed: string | undefined;
+                if (parsedExif.ExposureTime !== undefined && parsedExif.ExposureTime !== null) {
+                    const exp = Number(parsedExif.ExposureTime);
+                    if (!isNaN(exp) && exp > 0) {
+                        shutterSpeed = exp < 1 ? `1/${Math.round(1 / exp)}s` : `${exp}s`;
+                    }
+                }
+
+                const rawIso = parsedExif.ISO || parsedExif.PhotographicSensitivity || parsedExif.ISOSpeedRatings;
+                let iso: string | undefined;
+                if (rawIso !== undefined && rawIso !== null) {
+                    iso = `ISO ${rawIso}`;
+                }
+
+                const rawMeta: Record<string, string | undefined> = {
+                    camera,
+                    lens,
+                    focalLength,
+                    aperture,
+                    shutterSpeed,
+                    iso,
                 };
+
+                meta = Object.fromEntries(
+                    Object.entries(rawMeta).filter(([_, v]) => v !== undefined && v !== "")
+                ) as Record<string, string>;
             }
         } catch (err) {
             console.warn("Could not parse EXIF:", err);

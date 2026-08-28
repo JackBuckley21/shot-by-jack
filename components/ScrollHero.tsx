@@ -23,7 +23,13 @@ export default function ScrollHero({ shoot }: Props) {
     <div ref={ref} className="relative h-dvh overflow-hidden">
       <motion.div className="absolute inset-0" style={{ scale }}>
         {shoot.coverUrl ? (
-          <img src={shoot.coverUrl} alt={shoot.name} className="w-full h-full object-cover" />
+          <img
+            src={shoot.coverUrl}
+            alt={shoot.name}
+            decoding="async"
+            fetchPriority="high"
+            className="w-full h-full object-cover"
+          />
         ) : (
           <div className="w-full h-full" style={{ backgroundColor: "var(--muted)" }} />
         )}

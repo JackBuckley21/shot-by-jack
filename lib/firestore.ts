@@ -8,6 +8,7 @@ import {
   getDoc,
   query,
   orderBy,
+  onSnapshot,
   serverTimestamp,
   type Timestamp,
 } from "firebase/firestore";
@@ -38,7 +39,9 @@ export interface ImageMeta {
 export interface ShootImage {
   id: string;
   url: string;
+  originalUrl?: string;
   path: string;
+  originalPath?: string;
   name: string;
   order: number;
   meta?: ImageMeta;
@@ -93,4 +96,22 @@ export async function addShootImage(
 
 export async function deleteShootImage(shootId: string, imageId: string) {
   return deleteDoc(doc(db, "shoots", shootId, "images", imageId));
+}
+
+export function subscribeToShootImages(
+  shootId: string,
+  callback: (images: ShootImage[]) => void
+): () => void {
+  if (isMock) {
+    callback(MOCK_IMAGES[shootId] ?? []);
+    return () => {};
+  }
+  const q = query(
+    collection(db, "shoots", shootId, "images"),
+    orderBy("order", "asc")
+  );
+  return onSnapshot(q, (snap) => {
+    const images = snap.docs.map((d) => ({ id: d.id, ...d.data() } as ShootImage));
+    callback(images);
+  });
 }

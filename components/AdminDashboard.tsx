@@ -7,14 +7,13 @@ import {
   createShoot,
   updateShoot,
   deleteShoot,
-  getShootImages,
-  addShootImage,
   deleteShootImage,
+  subscribeToShootImages,
   type Shoot,
   type ShootImage,
 } from "@/lib/firestore";
 import { storage } from "@/lib/firebase";
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { ref as storageRef, uploadBytes, deleteObject } from "firebase/storage";
 import { MOCK_SHOOTS, MOCK_IMAGES } from "@/lib/mockData";
 
 const isMock = !process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
@@ -69,17 +68,29 @@ export default function AdminPage() {
 
   useEffect(() => { load(); }, []);
 
-  const loadImages = async (shoot: Shoot) => {
+  // ── Subscribe to shoot images in real-time ──────────────────────────────────
+  useEffect(() => {
+    if (!selectedShoot) {
+      setImages([]);
+      return;
+    }
+    if (isMock) {
+      setImages([...(mockImages[selectedShoot.id] ?? [])]);
+      return;
+    }
+    const unsubscribe = subscribeToShootImages(selectedShoot.id, (imgs) => {
+      setImages(imgs);
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, [selectedShoot?.id]);
+
+  const openShoot = (shoot: Shoot) => {
+    setSelectedShoot(shoot);
     if (isMock) {
       setImages([...(mockImages[shoot.id] ?? [])]);
-    } else {
-      setImages(await getShootImages(shoot.id));
     }
-  };
-
-  const openShoot = async (shoot: Shoot) => {
-    setSelectedShoot(shoot);
-    await loadImages(shoot);
     setView("shoot");
   };
 
@@ -107,19 +118,27 @@ export default function AdminPage() {
         await load();
         showToast(`"${newName}" created`);
       } else {
-        let coverUrl = "";
-        let coverPath = "";
         const file = coverInputRef.current?.files?.[0];
+        const docRef = await createShoot({
+          name: newName,
+          date: newDate,
+          description: newDesc,
+          coverUrl: "",
+          coverPath: "",
+          imageCount: 0,
+        });
         if (file) {
-          const path = `covers/${Date.now()}_${file.name}`;
+          const path = `shoots/${docRef.id}/cover/raw/${Date.now()}_${file.name}`;
           const sRef = storageRef(storage, path);
           await uploadBytes(sRef, file);
-          coverUrl = await getDownloadURL(sRef);
-          coverPath = path;
         }
-        await createShoot({ name: newName, date: newDate, description: newDesc, coverUrl, coverPath, imageCount: 0 });
         await load();
         showToast(`"${newName}" created`);
+        if (file) {
+          setTimeout(() => {
+            load();
+          }, 2500);
+        }
       }
       setNewName("");
       setNewDate(new Date().toISOString().slice(0, 10));
@@ -147,7 +166,7 @@ export default function AdminPage() {
 
   // ── Upload images ───────────────────────────────────────────────────────────
   const handleUploadImages = async (e: ChangeEvent<HTMLInputElement>) => {
-    if (!selectedShoot || !e.target.files) return;
+    if (!selectedShoot || !e.target.files || e.target.files.length === 0) return;
     setUploading(true);
     try {
       const files = Array.from(e.target.files);
@@ -165,25 +184,25 @@ export default function AdminPage() {
         );
         mockShoots = updated;
         setSelectedShoot(updated.find((s) => s.id === selectedShoot.id) ?? selectedShoot);
-        await loadImages(selectedShoot);
+        setImages([...existing]);
         showToast(`${files.length} photo${files.length > 1 ? "s" : ""} added`);
       } else {
-        let order = images.length;
         for (const file of files) {
-          const path = `shoots/${selectedShoot.id}/${Date.now()}_${file.name}`;
+          const path = `shoots/${selectedShoot.id}/raw/${Date.now()}_${file.name}`;
           const sRef = storageRef(storage, path);
           await uploadBytes(sRef, file);
-          const url = await getDownloadURL(sRef);
-          await addShootImage(selectedShoot.id, { url, path, name: file.name, order });
-          order++;
         }
-        await updateShoot(selectedShoot.id, { imageCount: images.length + files.length });
-        await loadImages(selectedShoot);
-        showToast(`${files.length} photo${files.length > 1 ? "s" : ""} added`);
+        showToast(`${files.length} photo${files.length > 1 ? "s" : ""} uploaded. Processing…`);
       }
+    } catch (err) {
+      console.error("Upload error:", err);
+      showToast("Upload failed. Please try again.");
     } finally {
       setUploading(false);
-      if (imagesInputRef.current) imagesInputRef.current.value = "";
+      e.target.value = "";
+      if (imagesInputRef.current) {
+        imagesInputRef.current.value = "";
+      }
     }
   };
 
@@ -199,13 +218,15 @@ export default function AdminPage() {
       );
       mockShoots = updated;
       setSelectedShoot(updated.find((s) => s.id === selectedShoot.id) ?? selectedShoot);
-      await loadImages(selectedShoot);
+      setImages([...mockImages[selectedShoot.id]]);
       showToast("Photo removed");
     } else {
-      try { await deleteObject(storageRef(storage, img.path)); } catch {}
+      try {
+        if (img.path) await deleteObject(storageRef(storage, img.path));
+        if (img.originalPath) await deleteObject(storageRef(storage, img.originalPath));
+      } catch {}
       await deleteShootImage(selectedShoot.id, img.id);
       await updateShoot(selectedShoot.id, { imageCount: Math.max(0, (selectedShoot.imageCount ?? 1) - 1) });
-      await loadImages(selectedShoot);
       showToast("Photo removed");
     }
   };
@@ -352,7 +373,7 @@ export default function AdminPage() {
                       style={{ borderRadius: "var(--radius)", backgroundColor: "var(--muted)" }}
                     >
                       {shoot.coverUrl && (
-                        <img src={shoot.coverUrl} alt={shoot.name} className="w-full h-full object-cover" />
+                        <img src={shoot.coverUrl} alt={shoot.name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                       )}
                     </div>
                     <div>
@@ -436,7 +457,7 @@ export default function AdminPage() {
                     exit={{ opacity: 0, scale: 0.88 }}
                     transition={{ duration: 0.25 }}
                   >
-                    <img src={img.url} alt={img.name} className="w-full h-full object-cover" />
+                    <img src={img.url} alt={img.name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                     <motion.div
                       className="absolute inset-0 flex flex-col items-center justify-center gap-3"
                       style={{ backgroundColor: "rgba(8,8,8,0)" }}

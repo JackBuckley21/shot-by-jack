@@ -85,19 +85,25 @@ export default function ImageGallery({ images }: Props) {
     if (!selected || downloading) return;
     setDownloading(type);
     try {
-      const res = await fetch(selected.url);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch image: ${res.statusText}`);
-      }
-      const rawBlob = await res.blob();
       const base = selected.name.replace(/\.[^/.]+$/, "") || "photo";
 
       if (type === "original") {
+        const downloadUrl = selected.originalUrl || selected.url;
+        const res = await fetch(downloadUrl);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch image: ${res.statusText}`);
+        }
+        const rawBlob = await res.blob();
         const ext = selected.name.includes(".") ? selected.name.split(".").pop() : "jpg";
         triggerBlobDownload(rawBlob, `${base}_original.${ext}`);
       } else {
+        const res = await fetch(selected.url);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch image: ${res.statusText}`);
+        }
+        const displayBlob = await res.blob();
         const maxWidth = type === "sd" ? 1080 : 2560;
-        const resizedBlob = await resizeImageBlob(rawBlob, maxWidth);
+        const resizedBlob = await resizeImageBlob(displayBlob, maxWidth);
         triggerBlobDownload(resizedBlob, `${base}_${type.toUpperCase()}.jpg`);
       }
     } catch (err) {
@@ -135,6 +141,8 @@ export default function ImageGallery({ images }: Props) {
                 layoutId={`img-${img.id}`}
                 src={img.url}
                 alt={img.name}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <motion.div
@@ -172,6 +180,8 @@ export default function ImageGallery({ images }: Props) {
                   layoutId={`img-${selected.id}`}
                   src={selected.url}
                   alt={selected.name}
+                  loading="lazy"
+                  decoding="async"
                   className="max-h-[80dvh] max-w-[85vw] object-contain"
                   style={{ pointerEvents: "none" }}
                 />

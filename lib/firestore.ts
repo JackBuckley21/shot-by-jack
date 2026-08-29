@@ -13,9 +13,6 @@ import {
   type Timestamp,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { MOCK_SHOOTS, MOCK_IMAGES } from "./mockData";
-
-const isMock = !process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
 
 export interface Shoot {
   id: string;
@@ -49,15 +46,31 @@ export interface ShootImage {
   createdAt: Timestamp | null;
 }
 
+export function sortShootsByDateDesc<T extends { date?: string }>(shoots: T[]): T[] {
+  return [...shoots].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+}
+
 export async function getShoots(): Promise<Shoot[]> {
-  if (isMock) return MOCK_SHOOTS;
-  const q = query(collection(db, "shoots"), orderBy("createdAt", "desc"));
+  const q = query(collection(db, "shoots"), orderBy("date", "desc"));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Shoot));
+  return sortShootsByDateDesc(
+    snap.docs.map((d) => ({ id: d.id, ...d.data() } as Shoot))
+  );
+}
+
+export function subscribeToShoots(
+  callback: (shoots: Shoot[]) => void
+): () => void {
+  const q = query(collection(db, "shoots"), orderBy("date", "desc"));
+  return onSnapshot(q, (snap) => {
+    const shoots = sortShootsByDateDesc(
+      snap.docs.map((d) => ({ id: d.id, ...d.data() } as Shoot))
+    );
+    callback(shoots);
+  });
 }
 
 export async function getShoot(id: string): Promise<Shoot | null> {
-  if (isMock) return MOCK_SHOOTS.find((s) => s.id === id) ?? null;
   const snap = await getDoc(doc(db, "shoots", id));
   if (!snap.exists()) return null;
   return { id: snap.id, ...snap.data() } as Shoot;
@@ -76,7 +89,6 @@ export async function deleteShoot(id: string) {
 }
 
 export async function getShootImages(shootId: string): Promise<ShootImage[]> {
-  if (isMock) return MOCK_IMAGES[shootId] ?? [];
   const q = query(
     collection(db, "shoots", shootId, "images"),
     orderBy("order", "asc")
@@ -103,10 +115,6 @@ export function subscribeToShootImages(
   shootId: string,
   callback: (images: ShootImage[]) => void
 ): () => void {
-  if (isMock) {
-    callback(MOCK_IMAGES[shootId] ?? []);
-    return () => {};
-  }
   const q = query(
     collection(db, "shoots", shootId, "images"),
     orderBy("order", "asc")

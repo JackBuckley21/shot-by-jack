@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, type ChangeEvent, type FormEvent } from "react";
+import { useState, useEffect, useRef, useCallback, type ChangeEvent, type FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   getShoots,
@@ -14,9 +14,6 @@ import {
 } from "@/lib/firestore";
 import { storage } from "@/lib/firebase";
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { MOCK_SHOOTS, MOCK_IMAGES } from "@/lib/mockData";
-
-const isMock = !process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
 
 type View = "shoots" | "shoot";
 
@@ -70,18 +67,6 @@ async function resizeCoverToWebP(file: File, maxWidth = 1920, quality = 0.82): P
   });
 }
 
-// ── Mock state (lives outside component so it survives navigation) ──────────
-let mockShoots: Shoot[] = MOCK_SHOOTS.map((s) => ({ ...s }));
-const mockImages: Record<string, ShootImage[]> = Object.fromEntries(
-  Object.entries(MOCK_IMAGES).map(([k, v]) => [k, v.map((i) => ({ ...i }))])
-);
-
-function useMockShoots() {
-  const [shoots, setShoots] = useState<Shoot[]>([...mockShoots]);
-  const reload = () => setShoots([...mockShoots]);
-  return { shoots, reload };
-}
-
 export default function AdminPage() {
   const [view, setView] = useState<View>("shoots");
   const [shoots, setShoots] = useState<Shoot[]>([]);
@@ -103,29 +88,37 @@ export default function AdminPage() {
     setTimeout(() => setToast(null), 2500);
   };
 
-  const load = async () => {
-    setLoading(true);
+  const load = useCallback(async () => {
     try {
-      if (isMock) {
-        setShoots([...mockShoots]);
-      } else {
-        setShoots(await getShoots());
-      }
+      const fetched = await getShoots();
+      setShoots(fetched);
+    } catch {
+      showToast("Failed to load shoots");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    let isCancelled = false;
+    getShoots()
+      .then((fetched) => {
+        if (!isCancelled) setShoots(fetched);
+      })
+      .catch(() => {
+        if (!isCancelled) showToast("Failed to load shoots");
+      })
+      .finally(() => {
+        if (!isCancelled) setLoading(false);
+      });
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   // ── Subscribe to shoot images in real-time ──────────────────────────────────
   useEffect(() => {
     if (!selectedShoot) {
-      setImages([]);
-      return;
-    }
-    if (isMock) {
-      setImages([...(mockImages[selectedShoot.id] ?? [])]);
       return;
     }
     const unsubscribe = subscribeToShootImages(selectedShoot.id, (imgs) => {
@@ -134,13 +127,11 @@ export default function AdminPage() {
     return () => {
       unsubscribe();
     };
-  }, [selectedShoot?.id]);
+  }, [selectedShoot]);
 
   const openShoot = (shoot: Shoot) => {
     setSelectedShoot(shoot);
-    if (isMock) {
-      setImages([...(mockImages[shoot.id] ?? [])]);
-    }
+    setImages([]);
     setView("shoot");
   };
 
@@ -150,53 +141,36 @@ export default function AdminPage() {
     if (!newName) return;
     setUploading(true);
     try {
-      if (isMock) {
-        const file = coverInputRef.current?.files?.[0];
-        const coverUrl = file ? URL.createObjectURL(file) : "";
-        const newShoot: Shoot = {
-          id: `mock-${Date.now()}`,
-          name: newName,
-          date: newDate,
-          description: newDesc,
-          coverUrl,
-          coverPath: "",
-          imageCount: 0,
-          createdAt: null,
-        };
-        mockShoots = [newShoot, ...mockShoots];
-        mockImages[newShoot.id] = [];
-        await load();
-        showToast(`"${newName}" created`);
-      } else {
-        let coverUrl = "";
-        let coverPath = "";
-        const file = coverInputRef.current?.files?.[0];
-        if (file) {
-          const webpBlob = await resizeCoverToWebP(file, 1920, 0.82);
-          const base = file.name.replace(/\.[^/.]+$/, "");
-          coverPath = `covers/${Date.now()}_${base}.webp`;
-          const sRef = storageRef(storage, coverPath);
-          await uploadBytes(sRef, webpBlob, {
-            contentType: "image/webp",
-            cacheControl: "public, max-age=31536000",
-          });
-          coverUrl = await getDownloadURL(sRef);
-        }
-        await createShoot({
-          name: newName,
-          date: newDate,
-          description: newDesc,
-          coverUrl,
-          coverPath,
-          imageCount: 0,
+      let coverUrl = "";
+      let coverPath = "";
+      const file = coverInputRef.current?.files?.[0];
+      if (file) {
+        const webpBlob = await resizeCoverToWebP(file, 1920, 0.82);
+        const base = file.name.replace(/\.[^/.]+$/, "");
+        coverPath = `covers/${Date.now()}_${base}.webp`;
+        const sRef = storageRef(storage, coverPath);
+        await uploadBytes(sRef, webpBlob, {
+          contentType: "image/webp",
+          cacheControl: "public, max-age=31536000",
         });
-        await load();
-        showToast(`"${newName}" created`);
+        coverUrl = await getDownloadURL(sRef);
       }
+      await createShoot({
+        name: newName,
+        date: newDate,
+        description: newDesc,
+        coverUrl,
+        coverPath,
+        imageCount: 0,
+      });
+      await load();
+      showToast(`"${newName}" created`);
       setNewName("");
       setNewDate(new Date().toISOString().slice(0, 10));
       setNewDesc("");
       setShowNewShoot(false);
+    } catch {
+      showToast("Failed to create shoot. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -205,15 +179,12 @@ export default function AdminPage() {
   // ── Delete shoot ────────────────────────────────────────────────────────────
   const handleDeleteShoot = async (shoot: Shoot) => {
     if (!confirm(`Delete "${shoot.name}"?`)) return;
-    if (isMock) {
-      mockShoots = mockShoots.filter((s) => s.id !== shoot.id);
-      delete mockImages[shoot.id];
-      await load();
-      showToast(`"${shoot.name}" deleted`);
-    } else {
+    try {
       await deleteShoot(shoot.id);
       await load();
       showToast(`"${shoot.name}" deleted`);
+    } catch {
+      showToast("Failed to delete shoot.");
     }
   };
 
@@ -223,32 +194,13 @@ export default function AdminPage() {
     setUploading(true);
     try {
       const files = Array.from(e.target.files);
-      if (isMock) {
-        const existing = mockImages[selectedShoot.id] ?? [];
-        let order = existing.length;
-        for (const file of files) {
-          const url = URL.createObjectURL(file);
-          existing.push({ id: `img-${Date.now()}-${order}`, url, path: "", name: file.name, order, createdAt: null });
-          order++;
-        }
-        mockImages[selectedShoot.id] = existing;
-        const updated = mockShoots.map((s) =>
-          s.id === selectedShoot.id ? { ...s, imageCount: existing.length } : s
-        );
-        mockShoots = updated;
-        setSelectedShoot(updated.find((s) => s.id === selectedShoot.id) ?? selectedShoot);
-        setImages([...existing]);
-        showToast(`${files.length} photo${files.length > 1 ? "s" : ""} added`);
-      } else {
-        for (const file of files) {
-          const path = `shoots/${selectedShoot.id}/raw/${Date.now()}_${file.name}`;
-          const sRef = storageRef(storage, path);
-          await uploadBytes(sRef, file);
-        }
-        showToast(`${files.length} photo${files.length > 1 ? "s" : ""} uploaded. Processing…`);
+      for (const file of files) {
+        const path = `shoots/${selectedShoot.id}/raw/${Date.now()}_${file.name}`;
+        const sRef = storageRef(storage, path);
+        await uploadBytes(sRef, file);
       }
-    } catch (err) {
-      console.error("Upload error:", err);
+      showToast(`${files.length} photo${files.length > 1 ? "s" : ""} uploaded. Processing…`);
+    } catch {
       showToast("Upload failed. Please try again.");
     } finally {
       setUploading(false);
@@ -262,25 +214,16 @@ export default function AdminPage() {
   // ── Delete image ────────────────────────────────────────────────────────────
   const handleDeleteImage = async (img: ShootImage) => {
     if (!selectedShoot || !confirm(`Remove this photo?`)) return;
-    if (isMock) {
-      mockImages[selectedShoot.id] = (mockImages[selectedShoot.id] ?? []).filter((i) => i.id !== img.id);
-      const updated = mockShoots.map((s) =>
-        s.id === selectedShoot.id
-          ? { ...s, imageCount: mockImages[selectedShoot.id].length }
-          : s
-      );
-      mockShoots = updated;
-      setSelectedShoot(updated.find((s) => s.id === selectedShoot.id) ?? selectedShoot);
-      setImages([...mockImages[selectedShoot.id]]);
-      showToast("Photo removed");
-    } else {
-      try {
-        if (img.path) await deleteObject(storageRef(storage, img.path));
-        if (img.originalPath) await deleteObject(storageRef(storage, img.originalPath));
-      } catch {}
+    try {
+      if (img.path) await deleteObject(storageRef(storage, img.path));
+      if (img.originalPath) await deleteObject(storageRef(storage, img.originalPath));
+    } catch {}
+    try {
       await deleteShootImage(selectedShoot.id, img.id);
       await updateShoot(selectedShoot.id, { imageCount: Math.max(0, (selectedShoot.imageCount ?? 1) - 1) });
       showToast("Photo removed");
+    } catch {
+      showToast("Failed to remove photo.");
     }
   };
 
@@ -379,13 +322,6 @@ export default function AdminPage() {
             )}
           </div>
         </div>
-
-        {/* Mock mode banner */}
-        {isMock && (
-          <div className="mt-4 px-4 py-3 text-xs" style={{ backgroundColor: "var(--muted)", borderRadius: "var(--radius)", color: "var(--muted-foreground)", borderLeft: "2px solid var(--accent)" }}>
-            <span style={{ color: "var(--accent)" }}>Preview mode</span> — changes are local only. Connect Firebase to persist data.
-          </div>
-        )}
 
         {/* Shoots list */}
         {view === "shoots" && (

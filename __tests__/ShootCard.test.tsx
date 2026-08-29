@@ -24,7 +24,7 @@ describe("ShootCard component", () => {
     expect(screen.getByText("Atmospheric evening stroll around Southbank.")).toBeInTheDocument();
 
     const link = screen.getByRole("link");
-    expect(link).toHaveAttribute("href", "/shoot/london-fog-2024");
+    expect(link).toHaveAttribute("href", "/shoot?id=london-fog-2024");
   });
 
   it("renders cover image with loading='lazy' and decoding='async' attributes", () => {

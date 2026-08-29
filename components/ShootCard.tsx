@@ -25,7 +25,7 @@ export default function ShootCard({ shoot, index }: Props) {
 
   return (
     <motion.div ref={ref} style={{ opacity, y, scale }}>
-      <Link href={`/shoot/${shoot.id}`} className="group block">
+      <Link href={`/shoot?id=${shoot.id}`} className="group block">
         <div
           className={`grid gap-0 ${isEven ? "md:grid-cols-[60fr_40fr]" : "md:grid-cols-[40fr_60fr]"}`}
         >

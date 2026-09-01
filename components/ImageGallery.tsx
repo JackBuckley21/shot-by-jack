@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence, type PanInfo, type Variants } from "motion/react";
 import type { ShootImage } from "@/lib/firestore";
 
@@ -88,29 +88,55 @@ export default function ImageGallery({ images }: Props) {
   const [[page, direction], setPage] = useState<[number, number]>([0, 0]);
   const [isOpen, setIsOpen] = useState(false);
   const [downloading, setDownloading] = useState<"sd" | "hd" | "original" | null>(null);
+  const [scale, setScale] = useState(1);
+
+  // Refs for gesture detection
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const scaleRef = useRef<number>(scale);
+  const initialPinchDistance = useRef<number | null>(null);
+  const initialScale = useRef<number>(1);
+  const lastTapTime = useRef<number>(0);
+  const lastTapPos = useRef<{ x: number; y: number } | null>(null);
+  const isPinching = useRef<boolean>(false);
+
+  useEffect(() => {
+    scaleRef.current = scale;
+  }, [scale]);
+
+  const resetZoom = useCallback(() => {
+    setScale(1);
+    initialPinchDistance.current = null;
+    isPinching.current = false;
+  }, []);
 
   const openModal = (_img: ShootImage, idx: number) => {
     setPage([idx, 0]);
+    resetZoom();
     setIsOpen(true);
   };
 
-  const closeModal = () => setIsOpen(false);
+  const closeModal = useCallback(() => {
+    resetZoom();
+    setIsOpen(false);
+  }, [resetZoom]);
 
   const paginate = useCallback(
     (newDirection: number, e?: React.MouseEvent) => {
       e?.stopPropagation();
+      resetZoom();
       setPage(([prevPage]) => {
         const nextPage = (prevPage + newDirection + images.length) % images.length;
         return [nextPage, newDirection];
       });
     },
-    [images.length]
+    [images.length, resetZoom]
   );
 
   const handleDragEnd = (
     _e: MouseEvent | TouchEvent | PointerEvent,
     { offset, velocity }: PanInfo
   ) => {
+    if (scale > 1) return;
     const swipeThreshold = 60;
     const velocityThreshold = 500;
     if (offset.x < -swipeThreshold || velocity.x < -velocityThreshold) {
@@ -119,6 +145,81 @@ export default function ImageGallery({ images }: Props) {
       paginate(-1);
     }
   };
+
+  // Non-passive multi-touch pinch and tap gesture listeners
+  useEffect(() => {
+    if (!isOpen) return;
+    const el = stageRef.current;
+    if (!el) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        isPinching.current = true;
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        initialPinchDistance.current = dist;
+        initialScale.current = scaleRef.current;
+      } else if (e.touches.length === 1) {
+        if (isPinching.current) return;
+        const touch = e.touches[0];
+        const now = Date.now();
+        const timeDiff = now - lastTapTime.current;
+        const lastPos = lastTapPos.current;
+
+        if (lastPos && timeDiff <= 300) {
+          const dist = Math.hypot(touch.clientX - lastPos.x, touch.clientY - lastPos.y);
+          if (dist < 40) {
+            // Double-tap detected
+            setScale((prev) => (prev > 1 ? 1 : 2.5));
+            lastTapTime.current = 0;
+            lastTapPos.current = null;
+            return;
+          }
+        }
+        lastTapTime.current = now;
+        lastTapPos.current = { x: touch.clientX, y: touch.clientY };
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (
+        e.touches.length === 2 &&
+        initialPinchDistance.current !== null &&
+        initialPinchDistance.current > 0
+      ) {
+        e.preventDefault();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const currentDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        const factor = currentDist / initialPinchDistance.current;
+        const newScale = Math.min(Math.max(initialScale.current * factor, 1), 4);
+        setScale(newScale);
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) {
+        if (isPinching.current) {
+          lastTapTime.current = 0;
+          lastTapPos.current = null;
+        }
+        initialPinchDistance.current = null;
+        isPinching.current = false;
+      }
+    };
+
+    el.addEventListener("touchstart", handleTouchStart, { passive: false });
+    el.addEventListener("touchmove", handleTouchMove, { passive: false });
+    el.addEventListener("touchend", handleTouchEnd, { passive: false });
+
+    return () => {
+      el.removeEventListener("touchstart", handleTouchStart);
+      el.removeEventListener("touchmove", handleTouchMove);
+      el.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [isOpen, page]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -135,7 +236,7 @@ export default function ImageGallery({ images }: Props) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, paginate]);
+  }, [isOpen, paginate, closeModal]);
 
   const currentImage = images[page];
 
@@ -233,26 +334,36 @@ export default function ImageGallery({ images }: Props) {
             <AnimatePresence custom={direction} initial={false} mode="popLayout">
               <motion.div
                 key={page}
+                ref={stageRef}
                 custom={direction}
                 variants={slideVariants}
                 initial="enter"
                 animate="center"
                 exit="exit"
-                drag="x"
+                drag={scale === 1 ? "x" : false}
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.6}
                 onDragEnd={handleDragEnd}
                 className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing pointer-events-auto"
                 style={{ position: "absolute", inset: 0 }}
               >
-                <motion.img
-                  src={currentImage.url}
-                  alt={currentImage.name}
-                  loading="lazy"
-                  decoding="async"
-                  draggable={false}
-                  className="max-h-[80dvh] max-w-[85vw] object-contain pointer-events-none select-none"
-                />
+                <motion.div
+                  drag={scale > 1}
+                  dragConstraints={false}
+                  dragElastic={0}
+                  animate={scale === 1 ? { scale: 1, x: 0, y: 0 } : { scale }}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  className="flex items-center justify-center touch-none"
+                >
+                  <img
+                    src={currentImage.url}
+                    alt={currentImage.name}
+                    loading="lazy"
+                    decoding="async"
+                    draggable={false}
+                    className="max-h-[80dvh] max-w-[85vw] object-contain pointer-events-none select-none"
+                  />
+                </motion.div>
               </motion.div>
             </AnimatePresence>
 
@@ -261,13 +372,30 @@ export default function ImageGallery({ images }: Props) {
               <p className="text-xs tracking-widest uppercase pointer-events-auto" style={{ color: "var(--muted-foreground)" }}>
                 {page + 1} / {images.length}
               </p>
-              <button
-                onClick={closeModal}
-                className="text-xs tracking-widest uppercase cursor-pointer pointer-events-auto"
-                style={{ color: "var(--muted-foreground)", background: "none", border: "none", fontFamily: "inherit" }}
-              >
-                Close ✕
-              </button>
+              <div className="flex items-center gap-4 pointer-events-auto">
+                {scale > 1 && (
+                  <button
+                    onClick={resetZoom}
+                    className="text-xs tracking-widest uppercase cursor-pointer transition-colors px-2.5 py-1"
+                    style={{
+                      color: "var(--foreground)",
+                      background: "rgba(255, 255, 255, 0.08)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "var(--radius)",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    Reset Zoom [1x]
+                  </button>
+                )}
+                <button
+                  onClick={closeModal}
+                  className="text-xs tracking-widest uppercase cursor-pointer"
+                  style={{ color: "var(--muted-foreground)", background: "none", border: "none", fontFamily: "inherit" }}
+                >
+                  Close ✕
+                </button>
+              </div>
             </div>
 
             {/* Prev / Next buttons */}

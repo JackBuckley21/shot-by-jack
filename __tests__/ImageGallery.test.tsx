@@ -138,4 +138,169 @@ describe("ImageGallery component", () => {
 
     expect(screen.getByText("No EXIF metadata")).toBeInTheDocument();
   });
+
+  it("handles double-tap gesture to toggle quick-zoom between 1x and 2.5x", () => {
+    render(<ImageGallery images={mockImages} />);
+
+    // Open first image
+    const thumbnails = screen.getAllByAltText("DSC01234.JPG");
+    fireEvent.click(thumbnails[0]);
+
+    // Reset Zoom button should not be present at 1x
+    expect(screen.queryByText("Reset Zoom [1x]")).not.toBeInTheDocument();
+
+    const imagesWithAlt = screen.getAllByAltText("DSC01234.JPG");
+    const modalImg = imagesWithAlt[1];
+    const slide = modalImg.closest("div[class*='cursor-grab']");
+    expect(slide).toBeTruthy();
+
+    // First tap
+    fireEvent.touchStart(slide!, {
+      touches: [{ clientX: 100, clientY: 100 }],
+    });
+    fireEvent.touchEnd(slide!, { touches: [] });
+
+    // Second tap within 300ms at close coordinates
+    fireEvent.touchStart(slide!, {
+      touches: [{ clientX: 102, clientY: 101 }],
+    });
+    fireEvent.touchEnd(slide!, { touches: [] });
+
+    // Should now be zoomed in to 2.5x, revealing the "Reset Zoom [1x]" button
+    expect(screen.getByText("Reset Zoom [1x]")).toBeInTheDocument();
+
+    // Another double tap toggles zoom back to 1x
+    fireEvent.touchStart(slide!, {
+      touches: [{ clientX: 100, clientY: 100 }],
+    });
+    fireEvent.touchEnd(slide!, { touches: [] });
+
+    fireEvent.touchStart(slide!, {
+      touches: [{ clientX: 102, clientY: 101 }],
+    });
+    fireEvent.touchEnd(slide!, { touches: [] });
+
+    expect(screen.queryByText("Reset Zoom [1x]")).not.toBeInTheDocument();
+  });
+
+  it("handles pinch-to-zoom gesture calculation to scale dynamically", () => {
+    render(<ImageGallery images={mockImages} />);
+
+    // Open first image
+    const thumbnails = screen.getAllByAltText("DSC01234.JPG");
+    fireEvent.click(thumbnails[0]);
+    const imagesWithAlt = screen.getAllByAltText("DSC01234.JPG");
+    const modalImg = imagesWithAlt[1];
+    const slide = modalImg.closest("div[class*='cursor-grab']");
+
+    // Pinch start: 2 touches 100px apart
+    fireEvent.touchStart(slide!, {
+      touches: [
+        { clientX: 100, clientY: 100 },
+        { clientX: 200, clientY: 100 },
+      ],
+    });
+
+    // Pinch move: 2 touches moved to 200px apart (2x distance factor)
+    fireEvent.touchMove(slide!, {
+      touches: [
+        { clientX: 50, clientY: 100 },
+        { clientX: 250, clientY: 100 },
+      ],
+    });
+
+    // Reset Zoom button should be visible as scale > 1
+    expect(screen.getByText("Reset Zoom [1x]")).toBeInTheDocument();
+
+    // Clicking "Reset Zoom [1x]" resets scale to 1
+    fireEvent.click(screen.getByText("Reset Zoom [1x]"));
+    expect(screen.queryByText("Reset Zoom [1x]")).not.toBeInTheDocument();
+  });
+
+  it("automatically resets zoom when navigating slides or closing modal", () => {
+    render(<ImageGallery images={mockImages} />);
+
+    // Open first image
+    const thumbnails = screen.getAllByAltText("DSC01234.JPG");
+    fireEvent.click(thumbnails[0]);
+    const imagesWithAlt = screen.getAllByAltText("DSC01234.JPG");
+    const modalImg = imagesWithAlt[1];
+    const slide = modalImg.closest("div[class*='cursor-grab']");
+
+    // Trigger double tap to zoom in
+    fireEvent.touchStart(slide!, {
+      touches: [{ clientX: 100, clientY: 100 }],
+    });
+    fireEvent.touchEnd(slide!, { touches: [] });
+    fireEvent.touchStart(slide!, {
+      touches: [{ clientX: 100, clientY: 100 }],
+    });
+    fireEvent.touchEnd(slide!, { touches: [] });
+
+    expect(screen.getByText("Reset Zoom [1x]")).toBeInTheDocument();
+
+    // Navigate to next slide via button
+    const nextBtn = screen.getByRole("button", { name: "Next image" });
+    fireEvent.click(nextBtn);
+
+    // Zoom should be reset on next slide
+    expect(screen.getByText("2 / 3")).toBeInTheDocument();
+    expect(screen.queryByText("Reset Zoom [1x]")).not.toBeInTheDocument();
+
+    // Zoom in on slide 2
+    const imagesWithAlt2 = screen.getAllByAltText("DSC01235.JPG");
+    const modalImg2 = imagesWithAlt2[1];
+    const slide2 = modalImg2.closest("div[class*='cursor-grab']");
+    fireEvent.touchStart(slide2!, {
+      touches: [{ clientX: 100, clientY: 100 }],
+    });
+    fireEvent.touchEnd(slide2!, { touches: [] });
+    fireEvent.touchStart(slide2!, {
+      touches: [{ clientX: 100, clientY: 100 }],
+    });
+    fireEvent.touchEnd(slide2!, { touches: [] });
+    expect(screen.getByText("Reset Zoom [1x]")).toBeInTheDocument();
+
+    // Close modal
+    fireEvent.click(screen.getByText("Close ✕"));
+    expect(screen.queryByText("Reset Zoom [1x]")).not.toBeInTheDocument();
+  });
+
+  it("clamps pinch-to-zoom scaling between 1x and 4x", () => {
+    render(<ImageGallery images={mockImages} />);
+
+    // Open first image
+    const thumbnails = screen.getAllByAltText("DSC01234.JPG");
+    fireEvent.click(thumbnails[0]);
+    const imagesWithAlt = screen.getAllByAltText("DSC01234.JPG");
+    const modalImg = imagesWithAlt[1];
+    const slide = modalImg.closest("div[class*='cursor-grab']");
+
+    // Pinch start: 100px apart
+    fireEvent.touchStart(slide!, {
+      touches: [
+        { clientX: 100, clientY: 100 },
+        { clientX: 200, clientY: 100 },
+      ],
+    });
+
+    // Pinch inward: 50px apart (factor 0.5x -> should clamp to 1x)
+    fireEvent.touchMove(slide!, {
+      touches: [
+        { clientX: 100, clientY: 100 },
+        { clientX: 150, clientY: 100 },
+      ],
+    });
+    // At scale 1x, Reset Zoom button should not appear
+    expect(screen.queryByText("Reset Zoom [1x]")).not.toBeInTheDocument();
+
+    // Pinch out extremely far: 1000px apart (factor 10x -> should clamp to 4x)
+    fireEvent.touchMove(slide!, {
+      touches: [
+        { clientX: 0, clientY: 100 },
+        { clientX: 1000, clientY: 100 },
+      ],
+    });
+    expect(screen.getByText("Reset Zoom [1x]")).toBeInTheDocument();
+  });
 });

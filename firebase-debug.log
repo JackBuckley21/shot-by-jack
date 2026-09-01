@@ -1,0 +1,215 @@
+[debug] [2026-09-01T02:43:15.677Z] ----------------------------------------------------------------------
+[debug] [2026-09-01T02:43:15.679Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\jackb\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting
+[debug] [2026-09-01T02:43:15.680Z] CLI Version:   15.28.2
+[debug] [2026-09-01T02:43:15.680Z] Platform:      win32
+[debug] [2026-09-01T02:43:15.680Z] Node Version:  v22.13.0
+[debug] [2026-09-01T02:43:15.680Z] Detected Agent: unknown
+[debug] [2026-09-01T02:43:15.680Z] Time:          Tue Sep 01 2026 03:43:15 GMT+0100 (British Summer Time)
+[debug] [2026-09-01T02:43:15.680Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-09-01T02:43:15.687Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-09-01T02:43:22.900Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-09-01T02:43:22.900Z] > authorizing via signed-in user (jack.buckley21@gmail.com)
+[debug] [2026-09-01T02:43:22.900Z] [iam] checking project shot-by-jack for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-09-01T02:43:22.901Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:22.901Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:22.901Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/shot-by-jack:testIamPermissions [none]
+[debug] [2026-09-01T02:43:22.901Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/shot-by-jack:testIamPermissions  x-goog-user-project=shot-by-jack
+[debug] [2026-09-01T02:43:22.901Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/shot-by-jack:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-09-01T02:43:23.142Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-09-01T02:43:23.142Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-09-01T02:43:23.519Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/shot-by-jack:testIamPermissions 200
+[debug] [2026-09-01T02:43:23.520Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/shot-by-jack:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-09-01T02:43:23.520Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:23.520Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:23.520Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/shot-by-jack [none]
+[debug] [2026-09-01T02:43:23.815Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/shot-by-jack 200
+[debug] [2026-09-01T02:43:23.816Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/shot-by-jack {"projectId":"shot-by-jack","projectNumber":"43168166739","displayName":"shot-by-jack","name":"projects/shot-by-jack","resources":{"hostingSite":"shot-by-jack"},"state":"ACTIVE","labels":{"firebase":"enabled","firebase/storage-default-bucket":"created"},"etag":"1_be9c3d91-d597-419a-a8e0-3ea5c637af6a"}
+[info] 
+[info] === Deploying to 'shot-by-jack'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2026-09-01T02:43:23.818Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:23.818Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:23.818Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/shot-by-jack/sites/shot-by-jack [none]
+[debug] [2026-09-01T02:43:24.941Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/shot-by-jack/sites/shot-by-jack 200
+[debug] [2026-09-01T02:43:24.941Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/shot-by-jack/sites/shot-by-jack {"name":"projects/shot-by-jack/sites/shot-by-jack","defaultUrl":"https://shot-by-jack.web.app","type":"DEFAULT_SITE"}
+[debug] [2026-09-01T02:43:24.944Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:24.944Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:24.944Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/shot-by-jack/versions [none]
+[debug] [2026-09-01T02:43:24.945Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/shot-by-jack/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2026-09-01T02:43:27.283Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/shot-by-jack/versions 200
+[debug] [2026-09-01T02:43:27.284Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/shot-by-jack/versions {"name":"projects/43168166739/sites/shot-by-jack/versions/14f14702aae5d732","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[shot-by-jack]: beginning deploy... 
+[info] i  hosting[shot-by-jack]: found 58 files in out 
+[debug] [2026-09-01T02:43:27.299Z] [hosting] uploading with 200 concurrency
+[debug] [2026-09-01T02:43:27.338Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:27.338Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:27.342Z] [hosting] hash cache [b3V0] stored for 58 files
+[debug] [2026-09-01T02:43:27.342Z] [hosting][hash queue][FINAL] {"max":32,"min":3,"avg":11.41379310344828,"active":0,"complete":58,"success":58,"errored":0,"retried":0,"total":58,"elapsed":42}
+[debug] [2026-09-01T02:43:27.342Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/43168166739/sites/shot-by-jack/versions/14f14702aae5d732:populateFiles [none]
+[debug] [2026-09-01T02:43:27.342Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/43168166739/sites/shot-by-jack/versions/14f14702aae5d732:populateFiles {"files":{"/window.svg":"6bd2003bd35bb32c1c0d99ab3aeac0cc1edaefd79f27df1d954bc87184048d74","/vercel.svg":"529a1a21b4a82475a82db26173c28d7b27e2dc9d4b900eaf1c5329d96eea4ddd","/next.svg":"0665b9ab4493aa9d7e988b57024e28772ae543e804b8cf6b0a3633854b7c3c7f","/globe.svg":"6502a3e6120bf2d6e8417e7c40bb57fb8a6954de9c86d3f43076a75b60cd23a2","/file.svg":"5a09df6187e21aa9a7d05094389385876ac93c818e1dcbb77a26a8fe408bf79c","/__next.__PAGE__.txt":"e20416ff78368b3c23d00dff18e6f17b40ec2d303650384ac366a3484f131f10","/__next._tree.txt":"6d73592c1262a4f968fe518019d75845be949662271544b7d48b0eb9b1c1c6d3","/_not-found.txt":"34ef20897d06d47c58d1a236867da37783051e8b6049856e9abc04dc7a363ea0","/_not-found.html":"5103fbb803f53570ab4d543ec52455aab605983d3b52866866246cc9bc16f469","/login.txt":"d93c981880570c54d7a54f2c75b8f9d5383219686cac121cf279543be7d07dff","/shoot.html":"62c20d4a0feca24f0c7f8444c37524fa9a427e4d312d00114b46c1c5721b65f5","/shoot.txt":"d7e8bb5b0b7f49f2f0ea10482cb834904499e9cb0fd915c31599e1e30820cbfc","/index.txt":"8a7e2c005737eb92e05f16de404e3b2c33f3d919cf9ae9d14e05be925e4cbdca","/admin.txt":"504c97ace2323af5545484d1d7b218ff46edc42a349819d23a5e0c000af545ac","/index.html":"b406b31954bb656962b758d53d67f7d2edb54016b677cd07ec0515446eba403f","/favicon.ico":"b1d44fcba984269f9f0624b2e2d7e0e7df1ee02fdac50edb6ec3d342cbc1f33c","/__next._full.txt":"8a7e2c005737eb92e05f16de404e3b2c33f3d919cf9ae9d14e05be925e4cbdca","/admin.html":"32e2e936059139e59145f90d46686ccc1b682ffdb67a9d648a443a01309e939d","/login.html":"0b0bd33ca18a580ba06e048471ce6bc95107db7e0521f0072c6391b5c67d21e1","/_not-found/__next._full.txt":"34ef20897d06d47c58d1a236867da37783051e8b6049856e9abc04dc7a363ea0","/_not-found/__next._not-found/__PAGE__.txt":"3ae1b84b3570f62a60dffdc3833596b5efaf805cec3d964442c0f5c1b4527eb2","/_next/static/mlsFwHAQZZQqhKQK_rdhb/_ssgManifest.js":"dc28a4dc92fe352ed5d2201bd3972ce47691bc8e89e0400a68d1541d0567c6d5","/_next/static/mlsFwHAQZZQqhKQK_rdhb/_clientMiddlewareManifest.js":"5e57f6166b702492ab9551af57e4546546c184673a4c0432f73b96f62820f7eb","/_not-found/__next._tree.txt":"9ebf58c8055edd5a4d02d807b0f675a520daeb3dfc77a6b9d99759dbe52a2c14","/_next/static/mlsFwHAQZZQqhKQK_rdhb/_buildManifest.js":"dcbe1c9b9159ca21caea98e1bad364012ae284e9551375ca62b83d2811efac91","/404.html":"5103fbb803f53570ab4d543ec52455aab605983d3b52866866246cc9bc16f469","/_next/static/media/8dd8a3188b79fd8f-s.2o9_j983y90g0.woff2":"2248ff5fd5bc155fabd095294b59016369d665ce303b2e339357c7a1ca463795","/_next/static/media/8e3fbf4aa84d044b-s.3ynaompv6mu4n.woff2":"f00591fbbb6bd9a22d9d88d24c58902a195fd670dfa8457fab547e540f968161","/_next/static/media/favicon.410v5a44n721m.ico":"b1d44fcba984269f9f0624b2e2d7e0e7df1ee02fdac50edb6ec3d342cbc1f33c","/_next/static/media/26a0a19eb96a029d-s.2ajvp03xtic_0.woff2":"93fbad5139bd8388a2d2c8cd14662f9c3e88e13d6bb4b0bef8dd1a8a51d6fb2c","/_next/static/chunks/310vm2bl3xxpt.js":"b9f691179b4eaf3e11c3df20deeefe2eeb94545eb88cde4d13a00a9c28d2fb3e","/_next/static/chunks/3xt19u4we5n2k.js":"f1b0d918e92943a02198f4e19dda4ab9a5a469dd2b5be1d99d3f83b783acbf82","/_next/static/chunks/turbopack-16uviso93d-pt.js":"2b2c5df6f8db0aa497e4858e4fb173314000116a9f79d1918674b461b7aaa514","/_next/static/chunks/30je5jlj952tt.js":"67d4b45e0c3847452db88c6dd16ea1b46b996a3069cdd2a14f4b041f06478e6e","/_next/static/chunks/2mmpezlrfmbu5.js":"8c38dcc16b886ce833c2defc7eb7aae5301963747763544b86e26ff909face4a","/_next/static/chunks/0xfsaqogqq3wt.js":"11fb0ebe7bdb60319bb42b356a3a3a63453573ce730e9bd2ca2b7cdaf6ef5634","/_next/static/chunks/0h2qsuyze9ds1.js":"92e864fa68d23df9f9c05cbf3c0a6ad6c19b437486e08eba6f82d26d743679ec","/_next/static/chunks/16j-c4eagpqbw.js":"1e458667c88237d20d020b431bfdba90240340feb1186b6643d6acc07aee5b49","/_next/static/chunks/2el1wlnsp0cuf.css":"749d23b4c2d2c123c5cfe5a4dd462a09af942ac48605df39861e34a3c374cf30","/shoot/__next._tree.txt":"9f2e469809c4437526af99b0497f8ce92d908ebe3eff358fe990b79b4707e8be","/_next/static/chunks/0613o7b453ycb.js":"2dc8b0d95313d949eb22ca494abf2fb14927e799fc2a1fa33c4595a4aaeead67","/shoot/__next.shoot/__PAGE__.txt":"19e7cd57d1cb5bb96703221d3503f266818295ef5c32fcd3de8895588deaee39","/shoot/__next._full.txt":"d7e8bb5b0b7f49f2f0ea10482cb834904499e9cb0fd915c31599e1e30820cbfc","/login/__next._tree.txt":"8834f48d0b1e37ca0d943e22ee95de8bfe53913cc08428246364b57430f2837d","/login/__next._full.txt":"d93c981880570c54d7a54f2c75b8f9d5383219686cac121cf279543be7d07dff","/login/__next.login/__PAGE__.txt":"5bd93c1cb87e6bc234df08e55222d69710c74f5c41880ad9b35476625ea4a45d","/_next/static/media/fad69795a077455b-s.p.0t285orp4l5or.woff2":"90c5a192ed8f5e9fb748d257c061d5cd5041cb705ede7711027a35d2957f2d9b","/_next/static/media/0c8f209abc35ee02-s.p.0c0g8ifvh7k7-.woff2":"1d7b6cfb71c6d2d372651acb94a263316339bb8fff7e6917a8d0d05379a6b6b1","/_next/static/media/57dc28f7118abe14-s.3bsu95r7x7mat.woff2":"5648b0aed44c68068b1377dc8c93651081fe9074f5d2b8999838767f71e82503","/_next/static/media/7ddd198311ba7843-s.p.3kq6k02b2ysv1.woff2":"718812fc913b44b31b736db2b2d1b9c1859bb782f58cdba6cdddf1d10475b342","/admin/__next._tree.txt":"9d6c89945af14e7b41a3ed8b0cb65a68e1981418dc37bd4509cdb179987d10bd","/admin/__next.admin/__PAGE__.txt":"1d9f23906e419b3b84b70a8d64770cf3bcee9d1040083cb4327978ba56aab4fd","/admin/__next._full.txt":"504c97ace2323af5545484d1d7b218ff46edc42a349819d23a5e0c000af545ac","/_next/static/chunks/2_2-1c0c4snqt.js":"814df8525cb37aaee3a7d7d38652b0dc45e18d12caf5db51032e61aeb1f3354a","/_next/static/chunks/0cz1d0mv5g_q7.js":"18e28d3214eda45048d80d3925ea7627b809e69ad2e95f7f98459e9146a61c3d","/_next/static/chunks/0g9871sz968l7.js":"40c06d577ee2d40373a6e586cc53924fc794e177ec6cc62ed8254efa0388475d","/_next/static/chunks/3byuobrkyz9bj.js":"51f7f9b73fa3efd28c5d833d7b1895d16a1286faf1b7d3f5e5654ed55bde3098","/_next/static/chunks/44hkyquq2wks4.js":"8d12fa3e0f78549230ec1db69e3607eb3adb898a7cf82eebd5853cc0681a9ce0"}}
+[debug] [2026-09-01T02:43:28.422Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/43168166739/sites/shot-by-jack/versions/14f14702aae5d732:populateFiles 200
+[debug] [2026-09-01T02:43:28.422Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/43168166739/sites/shot-by-jack/versions/14f14702aae5d732:populateFiles {"uploadRequiredHashes":["5103fbb803f53570ab4d543ec52455aab605983d3b52866866246cc9bc16f469","d93c981880570c54d7a54f2c75b8f9d5383219686cac121cf279543be7d07dff","32e2e936059139e59145f90d46686ccc1b682ffdb67a9d648a443a01309e939d","9d6c89945af14e7b41a3ed8b0cb65a68e1981418dc37bd4509cdb179987d10bd","1e458667c88237d20d020b431bfdba90240340feb1186b6643d6acc07aee5b49","34ef20897d06d47c58d1a236867da37783051e8b6049856e9abc04dc7a363ea0","62c20d4a0feca24f0c7f8444c37524fa9a427e4d312d00114b46c1c5721b65f5","d7e8bb5b0b7f49f2f0ea10482cb834904499e9cb0fd915c31599e1e30820cbfc","6d73592c1262a4f968fe518019d75845be949662271544b7d48b0eb9b1c1c6d3","9ebf58c8055edd5a4d02d807b0f675a520daeb3dfc77a6b9d99759dbe52a2c14","8834f48d0b1e37ca0d943e22ee95de8bfe53913cc08428246364b57430f2837d","8a7e2c005737eb92e05f16de404e3b2c33f3d919cf9ae9d14e05be925e4cbdca","5bd93c1cb87e6bc234df08e55222d69710c74f5c41880ad9b35476625ea4a45d","b406b31954bb656962b758d53d67f7d2edb54016b677cd07ec0515446eba403f","1d9f23906e419b3b84b70a8d64770cf3bcee9d1040083cb4327978ba56aab4fd","3ae1b84b3570f62a60dffdc3833596b5efaf805cec3d964442c0f5c1b4527eb2","9f2e469809c4437526af99b0497f8ce92d908ebe3eff358fe990b79b4707e8be","e20416ff78368b3c23d00dff18e6f17b40ec2d303650384ac366a3484f131f10","19e7cd57d1cb5bb96703221d3503f266818295ef5c32fcd3de8895588deaee39","504c97ace2323af5545484d1d7b218ff46edc42a349819d23a5e0c000af545ac","0b0bd33ca18a580ba06e048471ce6bc95107db7e0521f0072c6391b5c67d21e1","749d23b4c2d2c123c5cfe5a4dd462a09af942ac48605df39861e34a3c374cf30"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files"}
+[debug] [2026-09-01T02:43:28.423Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.423Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.423Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.423Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.423Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.423Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.423Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.423Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.423Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.423Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.424Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:28.425Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/5103fbb803f53570ab4d543ec52455aab605983d3b52866866246cc9bc16f469 [none]
+[debug] [2026-09-01T02:43:28.426Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/5103fbb803f53570ab4d543ec52455aab605983d3b52866866246cc9bc16f469 [stream]
+[debug] [2026-09-01T02:43:28.426Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/d93c981880570c54d7a54f2c75b8f9d5383219686cac121cf279543be7d07dff [none]
+[debug] [2026-09-01T02:43:28.426Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/d93c981880570c54d7a54f2c75b8f9d5383219686cac121cf279543be7d07dff [stream]
+[debug] [2026-09-01T02:43:28.427Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/32e2e936059139e59145f90d46686ccc1b682ffdb67a9d648a443a01309e939d [none]
+[debug] [2026-09-01T02:43:28.427Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/32e2e936059139e59145f90d46686ccc1b682ffdb67a9d648a443a01309e939d [stream]
+[debug] [2026-09-01T02:43:28.427Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/9d6c89945af14e7b41a3ed8b0cb65a68e1981418dc37bd4509cdb179987d10bd [none]
+[debug] [2026-09-01T02:43:28.427Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/9d6c89945af14e7b41a3ed8b0cb65a68e1981418dc37bd4509cdb179987d10bd [stream]
+[debug] [2026-09-01T02:43:28.427Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/1e458667c88237d20d020b431bfdba90240340feb1186b6643d6acc07aee5b49 [none]
+[debug] [2026-09-01T02:43:28.427Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/1e458667c88237d20d020b431bfdba90240340feb1186b6643d6acc07aee5b49 [stream]
+[debug] [2026-09-01T02:43:28.428Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/34ef20897d06d47c58d1a236867da37783051e8b6049856e9abc04dc7a363ea0 [none]
+[debug] [2026-09-01T02:43:28.428Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/34ef20897d06d47c58d1a236867da37783051e8b6049856e9abc04dc7a363ea0 [stream]
+[debug] [2026-09-01T02:43:28.428Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/62c20d4a0feca24f0c7f8444c37524fa9a427e4d312d00114b46c1c5721b65f5 [none]
+[debug] [2026-09-01T02:43:28.428Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/62c20d4a0feca24f0c7f8444c37524fa9a427e4d312d00114b46c1c5721b65f5 [stream]
+[debug] [2026-09-01T02:43:28.428Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/d7e8bb5b0b7f49f2f0ea10482cb834904499e9cb0fd915c31599e1e30820cbfc [none]
+[debug] [2026-09-01T02:43:28.428Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/d7e8bb5b0b7f49f2f0ea10482cb834904499e9cb0fd915c31599e1e30820cbfc [stream]
+[debug] [2026-09-01T02:43:28.428Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/6d73592c1262a4f968fe518019d75845be949662271544b7d48b0eb9b1c1c6d3 [none]
+[debug] [2026-09-01T02:43:28.428Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/6d73592c1262a4f968fe518019d75845be949662271544b7d48b0eb9b1c1c6d3 [stream]
+[debug] [2026-09-01T02:43:28.429Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/9ebf58c8055edd5a4d02d807b0f675a520daeb3dfc77a6b9d99759dbe52a2c14 [none]
+[debug] [2026-09-01T02:43:28.429Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/9ebf58c8055edd5a4d02d807b0f675a520daeb3dfc77a6b9d99759dbe52a2c14 [stream]
+[debug] [2026-09-01T02:43:28.429Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/8834f48d0b1e37ca0d943e22ee95de8bfe53913cc08428246364b57430f2837d [none]
+[debug] [2026-09-01T02:43:28.429Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/8834f48d0b1e37ca0d943e22ee95de8bfe53913cc08428246364b57430f2837d [stream]
+[debug] [2026-09-01T02:43:28.429Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/8a7e2c005737eb92e05f16de404e3b2c33f3d919cf9ae9d14e05be925e4cbdca [none]
+[debug] [2026-09-01T02:43:28.429Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/8a7e2c005737eb92e05f16de404e3b2c33f3d919cf9ae9d14e05be925e4cbdca [stream]
+[debug] [2026-09-01T02:43:28.429Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/5bd93c1cb87e6bc234df08e55222d69710c74f5c41880ad9b35476625ea4a45d [none]
+[debug] [2026-09-01T02:43:28.429Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/5bd93c1cb87e6bc234df08e55222d69710c74f5c41880ad9b35476625ea4a45d [stream]
+[debug] [2026-09-01T02:43:28.429Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/b406b31954bb656962b758d53d67f7d2edb54016b677cd07ec0515446eba403f [none]
+[debug] [2026-09-01T02:43:28.429Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/b406b31954bb656962b758d53d67f7d2edb54016b677cd07ec0515446eba403f [stream]
+[debug] [2026-09-01T02:43:28.430Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/1d9f23906e419b3b84b70a8d64770cf3bcee9d1040083cb4327978ba56aab4fd [none]
+[debug] [2026-09-01T02:43:28.430Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/1d9f23906e419b3b84b70a8d64770cf3bcee9d1040083cb4327978ba56aab4fd [stream]
+[debug] [2026-09-01T02:43:28.430Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/3ae1b84b3570f62a60dffdc3833596b5efaf805cec3d964442c0f5c1b4527eb2 [none]
+[debug] [2026-09-01T02:43:28.430Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/3ae1b84b3570f62a60dffdc3833596b5efaf805cec3d964442c0f5c1b4527eb2 [stream]
+[debug] [2026-09-01T02:43:28.430Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/9f2e469809c4437526af99b0497f8ce92d908ebe3eff358fe990b79b4707e8be [none]
+[debug] [2026-09-01T02:43:28.430Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/9f2e469809c4437526af99b0497f8ce92d908ebe3eff358fe990b79b4707e8be [stream]
+[debug] [2026-09-01T02:43:28.430Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/e20416ff78368b3c23d00dff18e6f17b40ec2d303650384ac366a3484f131f10 [none]
+[debug] [2026-09-01T02:43:28.430Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/e20416ff78368b3c23d00dff18e6f17b40ec2d303650384ac366a3484f131f10 [stream]
+[debug] [2026-09-01T02:43:28.430Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/19e7cd57d1cb5bb96703221d3503f266818295ef5c32fcd3de8895588deaee39 [none]
+[debug] [2026-09-01T02:43:28.430Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/19e7cd57d1cb5bb96703221d3503f266818295ef5c32fcd3de8895588deaee39 [stream]
+[debug] [2026-09-01T02:43:28.431Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/504c97ace2323af5545484d1d7b218ff46edc42a349819d23a5e0c000af545ac [none]
+[debug] [2026-09-01T02:43:28.431Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/504c97ace2323af5545484d1d7b218ff46edc42a349819d23a5e0c000af545ac [stream]
+[debug] [2026-09-01T02:43:28.431Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/0b0bd33ca18a580ba06e048471ce6bc95107db7e0521f0072c6391b5c67d21e1 [none]
+[debug] [2026-09-01T02:43:28.431Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/0b0bd33ca18a580ba06e048471ce6bc95107db7e0521f0072c6391b5c67d21e1 [stream]
+[debug] [2026-09-01T02:43:28.431Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/749d23b4c2d2c123c5cfe5a4dd462a09af942ac48605df39861e34a3c374cf30 [none]
+[debug] [2026-09-01T02:43:28.431Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/749d23b4c2d2c123c5cfe5a4dd462a09af942ac48605df39861e34a3c374cf30 [stream]
+[debug] [2026-09-01T02:43:28.437Z] [hosting][populate queue][FINAL] {"max":1087,"min":1087,"avg":1087,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":1099}
+[debug] [2026-09-01T02:43:28.437Z] [hosting] uploads queued: 22
+[debug] [2026-09-01T02:43:29.326Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/62c20d4a0feca24f0c7f8444c37524fa9a427e4d312d00114b46c1c5721b65f5 200
+[debug] [2026-09-01T02:43:29.326Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/62c20d4a0feca24f0c7f8444c37524fa9a427e4d312d00114b46c1c5721b65f5 [stream]
+[debug] [2026-09-01T02:43:29.327Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/3ae1b84b3570f62a60dffdc3833596b5efaf805cec3d964442c0f5c1b4527eb2 200
+[debug] [2026-09-01T02:43:29.327Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/3ae1b84b3570f62a60dffdc3833596b5efaf805cec3d964442c0f5c1b4527eb2 [stream]
+[debug] [2026-09-01T02:43:29.328Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/504c97ace2323af5545484d1d7b218ff46edc42a349819d23a5e0c000af545ac 200
+[debug] [2026-09-01T02:43:29.328Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/504c97ace2323af5545484d1d7b218ff46edc42a349819d23a5e0c000af545ac [stream]
+[debug] [2026-09-01T02:43:29.360Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/8a7e2c005737eb92e05f16de404e3b2c33f3d919cf9ae9d14e05be925e4cbdca 200
+[debug] [2026-09-01T02:43:29.361Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/8a7e2c005737eb92e05f16de404e3b2c33f3d919cf9ae9d14e05be925e4cbdca [stream]
+[debug] [2026-09-01T02:43:29.362Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/5103fbb803f53570ab4d543ec52455aab605983d3b52866866246cc9bc16f469 200
+[debug] [2026-09-01T02:43:29.362Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/5103fbb803f53570ab4d543ec52455aab605983d3b52866866246cc9bc16f469 [stream]
+[debug] [2026-09-01T02:43:29.365Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/749d23b4c2d2c123c5cfe5a4dd462a09af942ac48605df39861e34a3c374cf30 200
+[debug] [2026-09-01T02:43:29.365Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/749d23b4c2d2c123c5cfe5a4dd462a09af942ac48605df39861e34a3c374cf30 [stream]
+[debug] [2026-09-01T02:43:29.372Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/9d6c89945af14e7b41a3ed8b0cb65a68e1981418dc37bd4509cdb179987d10bd 200
+[debug] [2026-09-01T02:43:29.372Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/9d6c89945af14e7b41a3ed8b0cb65a68e1981418dc37bd4509cdb179987d10bd [stream]
+[debug] [2026-09-01T02:43:29.376Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/5bd93c1cb87e6bc234df08e55222d69710c74f5c41880ad9b35476625ea4a45d 200
+[debug] [2026-09-01T02:43:29.376Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/5bd93c1cb87e6bc234df08e55222d69710c74f5c41880ad9b35476625ea4a45d [stream]
+[debug] [2026-09-01T02:43:29.377Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/0b0bd33ca18a580ba06e048471ce6bc95107db7e0521f0072c6391b5c67d21e1 200
+[debug] [2026-09-01T02:43:29.378Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/0b0bd33ca18a580ba06e048471ce6bc95107db7e0521f0072c6391b5c67d21e1 [stream]
+[debug] [2026-09-01T02:43:29.380Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/19e7cd57d1cb5bb96703221d3503f266818295ef5c32fcd3de8895588deaee39 200
+[debug] [2026-09-01T02:43:29.380Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/19e7cd57d1cb5bb96703221d3503f266818295ef5c32fcd3de8895588deaee39 [stream]
+[debug] [2026-09-01T02:43:29.392Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/32e2e936059139e59145f90d46686ccc1b682ffdb67a9d648a443a01309e939d 200
+[debug] [2026-09-01T02:43:29.392Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/32e2e936059139e59145f90d46686ccc1b682ffdb67a9d648a443a01309e939d [stream]
+[debug] [2026-09-01T02:43:29.417Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/e20416ff78368b3c23d00dff18e6f17b40ec2d303650384ac366a3484f131f10 200
+[debug] [2026-09-01T02:43:29.417Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/e20416ff78368b3c23d00dff18e6f17b40ec2d303650384ac366a3484f131f10 [stream]
+[debug] [2026-09-01T02:43:29.435Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/d7e8bb5b0b7f49f2f0ea10482cb834904499e9cb0fd915c31599e1e30820cbfc 200
+[debug] [2026-09-01T02:43:29.435Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/d7e8bb5b0b7f49f2f0ea10482cb834904499e9cb0fd915c31599e1e30820cbfc [stream]
+[debug] [2026-09-01T02:43:29.436Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/34ef20897d06d47c58d1a236867da37783051e8b6049856e9abc04dc7a363ea0 200
+[debug] [2026-09-01T02:43:29.436Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/34ef20897d06d47c58d1a236867da37783051e8b6049856e9abc04dc7a363ea0 [stream]
+[debug] [2026-09-01T02:43:29.446Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/b406b31954bb656962b758d53d67f7d2edb54016b677cd07ec0515446eba403f 200
+[debug] [2026-09-01T02:43:29.446Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/b406b31954bb656962b758d53d67f7d2edb54016b677cd07ec0515446eba403f [stream]
+[debug] [2026-09-01T02:43:29.474Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/1d9f23906e419b3b84b70a8d64770cf3bcee9d1040083cb4327978ba56aab4fd 200
+[debug] [2026-09-01T02:43:29.474Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/1d9f23906e419b3b84b70a8d64770cf3bcee9d1040083cb4327978ba56aab4fd [stream]
+[debug] [2026-09-01T02:43:29.521Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/d93c981880570c54d7a54f2c75b8f9d5383219686cac121cf279543be7d07dff 200
+[debug] [2026-09-01T02:43:29.521Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/d93c981880570c54d7a54f2c75b8f9d5383219686cac121cf279543be7d07dff [stream]
+[debug] [2026-09-01T02:43:29.524Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/9f2e469809c4437526af99b0497f8ce92d908ebe3eff358fe990b79b4707e8be 200
+[debug] [2026-09-01T02:43:29.524Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/9f2e469809c4437526af99b0497f8ce92d908ebe3eff358fe990b79b4707e8be [stream]
+[debug] [2026-09-01T02:43:29.542Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/6d73592c1262a4f968fe518019d75845be949662271544b7d48b0eb9b1c1c6d3 200
+[debug] [2026-09-01T02:43:29.542Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/6d73592c1262a4f968fe518019d75845be949662271544b7d48b0eb9b1c1c6d3 [stream]
+[debug] [2026-09-01T02:43:29.577Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/1e458667c88237d20d020b431bfdba90240340feb1186b6643d6acc07aee5b49 200
+[debug] [2026-09-01T02:43:29.577Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/1e458667c88237d20d020b431bfdba90240340feb1186b6643d6acc07aee5b49 [stream]
+[debug] [2026-09-01T02:43:29.648Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/8834f48d0b1e37ca0d943e22ee95de8bfe53913cc08428246364b57430f2837d 200
+[debug] [2026-09-01T02:43:29.649Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/8834f48d0b1e37ca0d943e22ee95de8bfe53913cc08428246364b57430f2837d [stream]
+[debug] [2026-09-01T02:43:29.809Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/9ebf58c8055edd5a4d02d807b0f675a520daeb3dfc77a6b9d99759dbe52a2c14 200
+[debug] [2026-09-01T02:43:29.809Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/shot-by-jack/versions/14f14702aae5d732/files/9ebf58c8055edd5a4d02d807b0f675a520daeb3dfc77a6b9d99759dbe52a2c14 [stream]
+[debug] [2026-09-01T02:43:29.809Z] [hosting][upload queue][FINAL] {"max":1385,"min":902,"avg":1021.3181818181819,"active":0,"complete":22,"success":22,"errored":0,"retried":0,"total":22,"elapsed":1387}
+[info] +  hosting[shot-by-jack]: file upload complete 
+[debug] [2026-09-01T02:43:29.809Z] [hosting] deploy completed after 2524ms
+[debug] [2026-09-01T02:43:29.810Z] [
+  {
+    "config": {
+      "public": "out",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "site": "shot-by-jack"
+    },
+    "version": "projects/43168166739/sites/shot-by-jack/versions/14f14702aae5d732"
+  }
+]
+[info] i  hosting[shot-by-jack]: finalizing version... 
+[debug] [2026-09-01T02:43:29.811Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:29.811Z] Checked if tokens are valid: true, expires at: 1788232596151
+[debug] [2026-09-01T02:43:29.811Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/shot-by-jack/versions/14f14702aae5d732 updateMask=status%2Cconfig
+[debug] [2026-09-01T02:43:29.811Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/shot-by-jack/versions/14f14702aae5d732 {"status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]}}
